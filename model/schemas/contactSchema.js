@@ -20,8 +20,6 @@ const contactShema = new Schema(
       type: Array,
       set: data => (!data ? [] : data),
     },
-
-    //   data: {type: Date, default: () => Date.now}
   },
   { versionKey: false, timestamps: true },
 );

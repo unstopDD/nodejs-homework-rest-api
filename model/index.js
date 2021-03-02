@@ -1,5 +1,3 @@
-// const db = require('./db');
-// const { ObjectID } = require('mongodb');
 const Contact = require('./schemas/contactSchema');
 
 const listContacts = async () => {
@@ -13,11 +11,6 @@ const getContactById = async contactId => {
 };
 
 const addContact = async body => {
-  // const record = {
-  //   ...body,
-  // };
-  // const collection = await getCollection(db, 'contacts');
-  // const { ops: result } = await collection.insertOne(record);
   const result = await Contact.create(body);
 
   return result;
