@@ -94,4 +94,24 @@ const currentUser = async (req, res, next) => {
   }
 };
 
-module.exports = { reg, login, logout, currentUser };
+const updateSub = async (req, res, next) => {
+  const userId = req.user.id;
+  try {
+    await Users.updateSubUser(userId, req.body.subscription);
+    const user = await Users.findById(userId);
+    return res.status(OK).json({
+      status: 'success',
+      code: OK,
+      data: {
+        user: {
+          email: user.email,
+          subscription: user.subscription,
+        },
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { reg, login, logout, currentUser, updateSub };

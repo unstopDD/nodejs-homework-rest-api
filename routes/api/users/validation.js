@@ -19,6 +19,10 @@ const schemaLogin = Joi.object({
     .required(),
 });
 
+const schemaUpdateSub = Joi.object({
+  subscription: Joi.any().valid('free', 'pro', 'premium').required(),
+});
+
 const validate = (schema, obj, next) => {
   const { error } = schema.validate(obj);
   if (error) {
@@ -38,4 +42,8 @@ module.exports.registration = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   return validate(schemaLogin, req.body, next);
+};
+
+module.exports.updateSub = (req, _res, next) => {
+  return validate(schemaUpdateSub, req.body, next);
 };

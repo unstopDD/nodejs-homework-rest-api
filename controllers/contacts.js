@@ -6,12 +6,12 @@ const { OK, CREATED, NOT_FOUND } = HttpCode;
 const getAll = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const contacts = await Contacts.listContacts(userId);
+    const contacts = await Contacts.listContacts(userId, req.query);
     return res.json({
       status: 'success',
       code: OK,
       data: {
-        contacts,
+        ...contacts,
       },
     });
   } catch (e) {
