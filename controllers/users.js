@@ -90,7 +90,7 @@ const logout = async (req, res, next) => {
 };
 
 const currentUser = async (req, res, next) => {
-  const userId = req.user.id;
+  const userId = req.user._id;
   try {
     const user = await Users.findById(userId);
 
@@ -110,7 +110,7 @@ const currentUser = async (req, res, next) => {
 };
 
 const updateSub = async (req, res, next) => {
-  const userId = req.user.id;
+  const userId = req.user._id;
   try {
     await Users.updateSubUser(userId, req.body.subscription);
     const user = await Users.findById(userId);
@@ -131,7 +131,7 @@ const updateSub = async (req, res, next) => {
 
 const avatars = async (req, res, next) => {
   try {
-    const id = req.user.id;
+    const id = String(req.user._id);
     const avatarUrl = await saveAvatarToStatic(req);
     await Users.updateAatar(id, avatarUrl);
 
@@ -155,7 +155,7 @@ const avatars = async (req, res, next) => {
 };
 
 const saveAvatarToStatic = async req => {
-  const id = req.user.id;
+  const id = String(req.user._id);
   const AVATARS_OF_USERS = process.env.AVATARS_OF_USERS;
   const pathFile = req.file.path;
   const newAvatarName = `${Date.now()}-${req.file.originalname}`;
@@ -170,7 +170,7 @@ const saveAvatarToStatic = async req => {
   const avatarUrl = path.normalize(path.join(id, newAvatarName));
   try {
     await fs.unlink(
-      path.join(process.cwd(), AVATARS_OF_USERS, req.user.avatar),
+      path.join(process.cwd(), AVATARS_OF_USERS, req.user.avatarUrl),
     );
   } catch (e) {
     console.log(e.message);

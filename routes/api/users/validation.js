@@ -4,7 +4,7 @@ const { HttpCode } = require('../../../helpers/constants');
 const { BAD_REQUEST } = HttpCode;
 
 const schemaRegistration = Joi.object({
-  name: Joi.string().min(3).max(30).required(),
+  name: Joi.string().min(3).max(30).optional(),
   email: Joi.string()
     .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
     .required(),
