@@ -6,6 +6,7 @@ const schemaCreateContact = Joi.object({
     .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
     .required(),
   phone: Joi.string().required(),
+  subscription: Joi.any().valid('free', 'pro', 'premium').optional(),
 });
 
 const schemaUpdateContact = Joi.object({
