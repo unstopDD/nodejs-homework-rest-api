@@ -61,6 +61,14 @@ const userShema = new Schema(
       type: String,
       default: null,
     },
+    veryfy: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      required: [true, 'Verify token required'],
+    },
   },
   { versionKey: false, timestamps: true },
 );
