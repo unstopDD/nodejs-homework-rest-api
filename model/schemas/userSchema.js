@@ -61,6 +61,11 @@ const userShema = new Schema(
       type: String,
       default: null,
     },
+
+    verifyToken: {
+      type: String,
+      required: [true, 'Verify token required'],
+    },
   },
   { versionKey: false, timestamps: true },
 );

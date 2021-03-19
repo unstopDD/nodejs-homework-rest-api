@@ -5,12 +5,21 @@ require('dotenv').config();
 const Jimp = require('jimp');
 const { promisify } = require('util');
 const cloudinary = require('cloudinary').v2;
+const { nanoid } = require('nanoid');
 const fs = require('fs').promises;
 const path = require('path');
 
 const createFolderIsExist = require('../helpers/create-dir');
 const { HttpCode } = require('../helpers/constants');
-const { CONFLICT, CREATED, UNAUTHORIZED, OK, NO_CONTENT } = HttpCode;
+const {
+  CONFLICT,
+  CREATED,
+  UNAUTHORIZED,
+  OK,
+  NO_CONTENT,
+  BAD_REQUEST,
+} = HttpCode;
+const EmailService = require('../services/email');
 
 const SECRET_WORD = process.env.JWT_SECRET;
 cloudinary.config({
@@ -22,7 +31,7 @@ const uploadCloud = promisify(cloudinary.uploader.upload);
 
 const reg = async (req, res, next) => {
   try {
-    const { email } = req.body;
+    const { email, name } = req.body;
     const user = await Users.findByEmail(email);
     if (user) {
       return res.status(CONFLICT).json({
@@ -32,7 +41,16 @@ const reg = async (req, res, next) => {
         message: 'Email is already use',
       });
     }
-    const newUser = await Users.create(req.body);
+
+    const verifyToken = nanoid();
+    const emailService = new EmailService(process.env.NODE_ENV);
+    await emailService.sendEmail(verifyToken, email, name);
+
+    const newUser = await Users.create({
+      ...req.body,
+      verifyToken,
+    });
+
     return res.status(CREATED).json({
       status: 'success',
       code: CREATED,
@@ -54,7 +72,7 @@ const login = async (req, res, next) => {
     const { email, password } = req.body;
     const user = await Users.findByEmail(email);
     const isValidPassword = await user?.validPassword(password);
-    if (!user || !isValidPassword) {
+    if (!user || !isValidPassword || user.verifyToken) {
       return res.status(UNAUTHORIZED).json({
         status: 'error',
         code: UNAUTHORIZED,
@@ -195,4 +213,34 @@ const saveAvatarToCloud = async req => {
   return restult;
 };
 
-module.exports = { reg, login, logout, currentUser, updateSub, avatars };
+const verify = async (req, res, next) => {
+  try {
+    const user = await Users.findByVerifyToken(req.params.verifyToken);
+    if (user) {
+      await Users.updateVerifyToken(user.id, null);
+      return res.json({
+        status: 'success',
+        code: OK,
+        message: 'Verification successful',
+      });
+    }
+    return res.status(BAD_REQUEST).json({
+      status: 'error',
+      code: BAD_REQUEST,
+      data: 'Bad request',
+      message: 'Link is not valid',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = {
+  reg,
+  login,
+  logout,
+  currentUser,
+  updateSub,
+  avatars,
+  verify,
+};
