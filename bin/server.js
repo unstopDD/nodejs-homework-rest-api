@@ -3,7 +3,7 @@ const db = require('../model/db');
 const createFolderIsExist = require('../helpers/create-dir');
 require('dotenv').config();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 db.then(() => {
   app.listen(PORT, async () => {
